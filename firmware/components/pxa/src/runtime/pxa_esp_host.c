@@ -4941,6 +4941,14 @@ bool pxa_esp_host_initialize(void) {
     ui_config.primary_environment.font_scale_q16 = UINT32_C(1) << 16;
     read_display_environment(&ui_config.primary_environment);
     pxa_lvgl_ui_theme_init(&ui_config.theme);
+#if defined(CONFIG_LV_USE_FREETYPE) && CONFIG_LV_USE_FREETYPE
+    struct stat font_st;
+    if (stat(pxa_esp_system_font_path(), &font_st) != 0)
+        ESP_LOGE(PXA_ESP_HOST_TAG,
+                 "System font missing: %s. Reflash the pxa_data factory "
+                 "image with the CJK font; text falls back to ASCII-only",
+                 pxa_esp_system_font_path());
+#endif
     g_host.ui_caption_font = load_ui_font(12, pxa_esp_ui_shell_text_font());
     g_host.ui_label_font = load_ui_font(14, pxa_esp_ui_shell_text_font());
     g_host.ui_body_font = load_ui_font(16, pxa_esp_ui_shell_text_font());
